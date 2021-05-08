@@ -1,0 +1,100 @@
+name('Event service is listening for the inbound events') {
+    protocol = rmq
+    execution = async
+    timeout = 5000
+    readFrom ['booking.log']
+
+    variables {
+        eventCode = get(insertEventTest).(testData.where.code)
+    }
+
+    message {
+        json {
+                 eventCode = ${eventCode}
+                 success = true
+             }
+    }
+
+    validate {
+        '\'booking.log\''.toString().jsonPath(eventCode) = ${eventCode}
+        '\'booking.log\''.toString() {
+               all_match [
+                     match('.*eventCode\".*:.*\"${eventCode}\".*')
+               ]
+               jsonPath(eventCode) = contains(${eventCode})
+        }
+    }
+}
+
+name('Event (.*) exist in the system with default seats') {
+    id = insertEventTest
+    servers [skellig-db]
+    table = event
+    command = update
+
+    values {
+               name = 'event 1'
+               date = toDateTime(01-01-2021 12:30:00)
+               location = 'city 1'
+               price_per_seats = 's1=1,s2=2,s3=3,s4=4,s5=5'
+               taken_seats = s5
+           #               taken_seats = ''
+               where {
+                         code = ${1:evnt00001}
+                     }
+           }
+}
+
+name('Booking was recorded in the DB with seats (.*)') {
+    servers [skellig-db]
+    table = booking
+    command = select
+
+    where {
+              code = get(insertEventTest).(testData.where.code)
+          }
+
+    validate {
+        skellig-db{
+                      any_match[
+                                  {
+                                      seats = ${1:s1}
+                                  }
+                              ]
+                  }
+    }
+}
+
+name('Event (.+) no longer have the taken seats (.+)') {
+    servers [skellig-db]
+    table = event
+    command = select
+
+    where {
+       code = ${1}
+    }
+
+    validate {
+        skellig-db {
+            size = int(1)
+            fromIndex(0).taken_seats = contains(${2:s1})
+        }
+    }
+}
+
+name('Event Changed Log was recorded in the DB for event (.+)') {
+    provider = cassandra
+    servers [skellig-log-db]
+    table = skellig.eventchangedlog
+    command = select
+
+    validate {
+        skellig-log-db {
+            any_match [
+                 {
+                     'after.jsonPath(code,true)' = ${1}
+                 }
+             ]
+        }
+    }
+}

@@ -1,0 +1,182 @@
+name('Event service is listening for the booking events') {
+    protocol = rmq
+    execution = async
+    timeout = 20
+    delay = 500
+    attempts = 10
+    readFrom ['booking.log']
+
+    message {
+        json {
+                 eventCode = get(addEventTest).variables.eventCode
+                 success = true
+             }
+    }
+
+    validate {
+        '\'booking.log\''.toString().jsonPath(eventCode) = get(addEventTest).variables.eventCode
+    }
+}
+
+name('Event registered in the system with available seats (.+)') {
+    test = 'Add event with available seats ${1}'
+    passed {
+               test = 'Event inserted in database'
+           }
+}
+
+name('Add event with available seats (.+)') {
+    id = addEventTest
+    protocol = rmq
+    sendTo ['event.changed']
+    properties { content_type = application/json }
+
+    variables {
+        eventCode = ${newEventCode:evt1inc(event,5)}
+    }
+
+    message {
+        json {
+                 code = ${eventCode}
+                 name = 'event 1'
+                 date = toDateTime(01-01-2020 10:30:00)
+                 location = somewhere
+                 pricePerSeats [ ${1} ]
+                 takenSeats [${takenSeats:}]
+             }
+    }
+}
+
+name('Event inserted in database') {
+    servers [skellig-db]
+    table = event
+    command = select
+
+    where {
+              code = get(addEventTest).variables.eventCode
+          }
+
+    validate {
+        skellig-db {
+                       size = int(1)
+                   }
+    }
+}
+
+name('Seats (.+) have been booked successfully for the event') {
+     servers [skellig-db]
+     table = event
+     command = select
+
+     where {
+           code = get(addEventTest).variables.eventCode
+     }
+
+    validate {
+         skellig-db.fromIndex(0).taken_seats = contains(${1})
+    }
+}
+
+name('Book seats (.+) of the event\s*(.*)') {
+    url = '/booking/request'
+    http_method = POST
+    http_headers{ Content-type = 'application/json'}
+
+    variables {
+               eventCode = '${2:${get(addEventTest).variables.eventCode}}'
+              }
+
+    payload {
+        json {
+                 eventCode = ${eventCode}
+                 seats = listOf(${1})
+             }
+    }
+
+    validate {
+        statusCode = int(200)
+        'body.toString()' {
+                              jsonPath(eventCode) = ${eventCode}
+                              jsonPath(success) = true
+                          }
+    }
+}
+
+name('Try to book seats (.+) of the event\s*(.*)') {
+    id = tryBookSeatsTest
+    url = '/booking/request'
+    http_method = POST
+    http_headers{ Content-type = 'application/json'}
+
+    payload {
+        json {
+                 eventCode = ${2}
+                 seats = listOf(${1})
+             }
+    }
+}
+
+name('Failed to book (.+) because') {
+
+    validate {
+          fromTest = tryBookSeatsTest
+          body.toString() = ${reason}
+    }
+}
+
+name('Payment service received booking confirmation') {
+    id = bookingReceivedTest
+    protocol = ibmmq
+    readFrom ['DEV.QUEUE.3']
+
+    validate {
+          '\'DEV.QUEUE.3\''.toString().jsonPath(eventCode) = get(addEventTest).variables.eventCode
+    }
+}
+
+name('Confirm payment for the booking') {
+    id = confirmBookingTest
+    url = '/booking/confirm'
+    http_method = POST
+    http_headers { Content-type = 'application/json'}
+
+    variables {
+         bookingCode = get(bookingReceivedTest.result).'\'DEV.QUEUE.3\''.toString().jsonPath(bookingCode)
+         paymentToken = get(bookingReceivedTest.result).'\'DEV.QUEUE.3\''.toString().jsonPath(paymentToken)
+    }
+
+    payload {
+         json {
+            bookingCode = ${bookingCode}
+            paymentProviderToken = ${token : ${paymentToken}}
+            amount = 60
+         }
+    }
+
+    validate {
+         if {
+            condition = '${token} == invalid'
+            then {  statusCode = int(400)  }
+            else {  statusCode = int(200)  }
+         }
+    }
+}
+
+name('Payment for the booking was (\w+)') {
+    url = /booking/get(confirmBookingTest).(variables.bookingCode)
+    http_method = GET
+    http_headers { Content-type = 'application/json'}
+
+    validate {
+        body.jsonPath(status) = ${1}
+    }
+}
+
+name('Cancel the booking and check the status') {
+    url = /booking/cancel/get(bookingReceivedTest.result).'\'DEV.QUEUE.3\''.toString().jsonPath(bookingCode)
+    http_method = POST
+
+    validate {
+        statusCode = int(200)
+    }
+}
