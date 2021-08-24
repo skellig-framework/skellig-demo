@@ -6,12 +6,12 @@ import org.skellig.demo.app.rest.model.BookEventRequest;
 import org.skellig.demo.app.rest.model.BookEventResponse;
 import org.skellig.demo.app.rest.model.BookingPaymentRequest;
 import org.skellig.demo.app.service.BookingService;
+import org.skellig.demo.app.service.BookingSubscriptionService;
 import org.skellig.demo.app.service.EventService;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,8 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-
 @RestController
 public class BookingRequestController {
 
@@ -36,16 +34,19 @@ public class BookingRequestController {
     private BookingService bookingService;
     private EventService eventService;
     private ObjectMapper objectMapper;
+    private BookingSubscriptionService bookingSubscriptionService;
 
     @Autowired
     public BookingRequestController(JmsTemplate jmsTemplate,
                                     RabbitTemplate rmqTemplate,
                                     BookingService bookingService,
-                                    EventService eventService) {
+                                    EventService eventService,
+                                    BookingSubscriptionService bookingSubscriptionService) {
         this.jmsTemplate = jmsTemplate;
         this.rmqTemplate = rmqTemplate;
         this.bookingService = bookingService;
         this.eventService = eventService;
+        this.bookingSubscriptionService = bookingSubscriptionService;
         objectMapper = new ObjectMapper();
     }
 
@@ -80,6 +81,11 @@ public class BookingRequestController {
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
+    }
+
+    @PostMapping("/booking/report/notify/all")
+    public void notifyBookingsReport() {
+        bookingSubscriptionService.sendReportUpdatesToSubscribers();
     }
 
     @ExceptionHandler({Exception.class})

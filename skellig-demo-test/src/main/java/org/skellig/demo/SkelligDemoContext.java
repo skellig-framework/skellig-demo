@@ -10,16 +10,22 @@ import org.skellig.teststep.processor.ibmmq.IbmMqTestStepProcessor;
 import org.skellig.teststep.processor.ibmmq.model.factory.IbmMqTestStepFactory;
 import org.skellig.teststep.processor.jdbc.JdbcTestStepProcessor;
 import org.skellig.teststep.processor.jdbc.model.factory.JdbcTestStepFactory;
+import org.skellig.teststep.processor.performance.LongRunTestStepProcessor;
+import org.skellig.teststep.processor.performance.metrics.prometheus.PrometheusMetricsFactory;
+import org.skellig.teststep.processor.performance.model.factory.PerformanceTestStepFactory;
+import org.skellig.teststep.processor.rmq.RmqConsumableTestStepProcessor;
 import org.skellig.teststep.processor.rmq.RmqTestStepProcessor;
+import org.skellig.teststep.processor.rmq.model.factory.RmqConsumableTestStepFactory;
 import org.skellig.teststep.processor.rmq.model.factory.RmqTestStepFactory;
+import org.skellig.teststep.processor.tcp.TcpConsumableTestStepProcessor;
 import org.skellig.teststep.processor.tcp.TcpTestStepProcessor;
+import org.skellig.teststep.processor.tcp.model.factory.TcpConsumableTestStepFactory;
 import org.skellig.teststep.processor.tcp.model.factory.TcpTestStepFactory;
 import org.skellig.teststep.processor.unix.UnixShellTestStepProcessor;
 import org.skellig.teststep.processor.unix.model.factory.UnixShellTestStepFactory;
 import org.skellig.teststep.runner.context.SkelligTestContext;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,69 +35,97 @@ public class SkelligDemoContext extends SkelligTestContext {
     @Override
     protected List<TestStepProcessorDetails> getTestStepProcessors() {
         Config config = getConfig();
+
         return Stream.of(
-                new TestStepProcessorDetails(
+                createTestStepProcessorFrom(
                         new HttpTestStepProcessor.Builder()
                                 .withHttpService(config)
                                 .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
-                        createTestStepFactoryFrom(HttpTestStepFactory::new)
+                        HttpTestStepFactory::new
                 ),
-                new TestStepProcessorDetails(
+                createTestStepProcessorFrom(
                         new JdbcTestStepProcessor.Builder()
                                 .withDbServers(config)
                                 .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
-                        createTestStepFactoryFrom(JdbcTestStepFactory::new)
+                        JdbcTestStepFactory::new
                 ),
-                new TestStepProcessorDetails(
+                createTestStepProcessorFrom(
                         new CassandraTestStepProcessor.Builder()
                                 .withDbServers(config)
                                 .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
-                        createTestStepFactoryFrom(CassandraTestStepFactory::new)
+                        CassandraTestStepFactory::new
                 ),
-                new TestStepProcessorDetails(
+                createTestStepProcessorFrom(
                         new RmqTestStepProcessor.Builder()
                                 .rmqChannels(config)
                                 .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
-                        createTestStepFactoryFrom(RmqTestStepFactory::new)
+                        RmqTestStepFactory::new
                 ),
-                new TestStepProcessorDetails(
+                createTestStepProcessorFrom(
+                        new RmqConsumableTestStepProcessor.Builder()
+                                .rmqChannels(config)
+                                .withTestStepResultConverter(getTestStepResultConverter())
+                                .withTestScenarioState(getTestScenarioState())
+                                .withValidator(getTestStepResultValidator())
+                                .build(),
+                        RmqConsumableTestStepFactory::new
+                ),
+                createTestStepProcessorFrom(
                         new IbmMqTestStepProcessor.Builder()
                                 .ibmMqChannels(config)
                                 .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
-                        createTestStepFactoryFrom(IbmMqTestStepFactory::new)
+                        IbmMqTestStepFactory::new
                 ),
-                new TestStepProcessorDetails(
+                createTestStepProcessorFrom(
                         new TcpTestStepProcessor.Builder()
                                 .tcpChannels(config)
                                 .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
-                        createTestStepFactoryFrom(TcpTestStepFactory::new)
+                        TcpTestStepFactory::new
                 ),
-                new TestStepProcessorDetails(
+                createTestStepProcessorFrom(
+                        new TcpConsumableTestStepProcessor.Builder()
+                                .tcpChannels(config)
+                                .withTestStepResultConverter(getTestStepResultConverter())
+                                .withTestScenarioState(getTestScenarioState())
+                                .withValidator(getTestStepResultValidator())
+                                .build(),
+                        TcpConsumableTestStepFactory::new
+                ),
+                createTestStepProcessorFrom(
                         new UnixShellTestStepProcessor.Builder()
                                 .withHost(config)
                                 .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
-                        createTestStepFactoryFrom(UnixShellTestStepFactory::new)
+                        UnixShellTestStepFactory::new
+                ),
+                createTestStepProcessorFrom(
+                        rootTestStepProcessor ->
+                                new LongRunTestStepProcessor.Builder()
+                                        .testStepProcessor(rootTestStepProcessor)
+                                        .testStepRegistry(getTestStepRegistry())
+                                        .metricsFactory(new PrometheusMetricsFactory())
+                                        .build(),
+                        PerformanceTestStepFactory::new
                 )
         ).collect(Collectors.toList());
     }

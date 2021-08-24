@@ -1,3 +1,20 @@
+server:
+  port: 6080
+
+management:
+  metrics:
+    export:
+      prometheus:
+        pushgateway:
+          enabled: true
+  endpoints:
+    jmx:
+      exposure:
+        include: "health,info"
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+
 ibm:
   mq:
     queue-manager: QM1

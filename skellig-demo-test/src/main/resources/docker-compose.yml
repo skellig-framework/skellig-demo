@@ -1,0 +1,31 @@
+version: '3'
+services:
+  node-1:
+    image: skellig-demo:latest
+    ports:
+      - "8081:7080"
+    environment:
+      - SKELLIG_PROFILE=local
+    container_name: skellig-demo-perf-node-1
+    restart: always
+
+  node-2:
+    image: skellig-demo:latest
+    ports:
+      - "8082:7080"
+    container_name: skellig-demo-perf-node-2
+    restart: always
+
+  node-3:
+    image: skellig-demo:latest
+    ports:
+      - "8083:7080"
+    container_name: skellig-demo-perf-node-3
+    restart: always
+
+  node-4:
+    image: skellig-demo:latest
+    ports:
+      - "8084:7080"
+    container_name: skellig-demo-perf-node-4
+    restart: always
