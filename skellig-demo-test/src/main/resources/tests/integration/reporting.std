@@ -1,6 +1,6 @@
 name('Request bookings report') {
     protocol = tcp
-    timeout = 100
+    timeout = 1000
     attempts = 1
     sendTo [local]
     readFrom [local]

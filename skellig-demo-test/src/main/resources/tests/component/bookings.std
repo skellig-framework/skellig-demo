@@ -5,17 +5,19 @@ name('Event service is listening for the inbound events') {
     readFrom ['booking.log']
 
     variables {
-        eventCode = get(insertEventTest).(testData.where.code)
+        eventCode = get(insertEventTest).testData.fromIndex(5)
+        #eventCode = get(insertEventTest).variables.code
     }
 
     message {
         json {
                  eventCode = ${eventCode}
                  success = true
-             }
+        }
     }
 
     validate {
+    # just a demonstration of different ways how the response can be validated
         '\'booking.log\''.toString().jsonPath(eventCode) = ${eventCode}
         '\'booking.log\''.toString() {
                all_match [
@@ -29,20 +31,22 @@ name('Event service is listening for the inbound events') {
 name('Event (.*) exist in the system with default seats') {
     id = insertEventTest
     servers [skellig-db]
-    table = event
-    command = update
+    query = 'UPDATE event SET
+            name=?, date=?, location=?, price_per_seats=?, taken_seats=?
+            WHERE code=?'
 
-    values {
-               name = 'event 1'
-               date = toDateTime(01-01-2021 12:30:00)
-               location = 'city 1'
-               price_per_seats = 's1=1,s2=2,s3=3,s4=4,s5=5'
-               taken_seats = s5
-           #               taken_seats = ''
-               where {
-                         code = ${1:evnt00001}
-                     }
-           }
+    variables {
+        code = ${1:evnt00001}
+    }
+
+    values [
+       'event 1'
+       toDateTime(01-01-2021 12:30:00)
+       'city 1'
+       's1=1,s2=2,s3=3,s4=4,s5=5'
+       s5
+       ${code}
+    ]
 }
 
 name('Booking was recorded in the DB with seats (.*)') {
@@ -51,28 +55,26 @@ name('Booking was recorded in the DB with seats (.*)') {
     command = select
 
     where {
-              code = get(insertEventTest).(testData.where.code)
-          }
+       code = get(insertEventTest).testData.fromIndex(5)
+    }
 
     validate {
         skellig-db{
-                      any_match[
-                                  {
-                                      seats = ${1:s1}
-                                  }
-                              ]
-                  }
+             any_match[
+                {
+                    seats = ${1:s1}
+                }
+             ]
+        }
     }
 }
 
 name('Event (.+) no longer have the taken seats (.+)') {
+    provider = jdbc
     servers [skellig-db]
-    table = event
-    command = select
+    query = 'SELECT taken_seats FROM event WHERE code=?'
 
-    where {
-       code = ${1}
-    }
+    where [ ${1} ]
 
     validate {
         skellig-db {

@@ -1,7 +1,7 @@
 name('Event service is listening for the booking events') {
     protocol = rmq
     execution = async
-    timeout = 20
+    timeout = 1000
     delay = 500
     attempts = 10
     readFrom ['booking.log']
@@ -10,9 +10,11 @@ name('Event service is listening for the booking events') {
         json {
                  eventCode = get(addEventTest).variables.eventCode
                  success = true
-             }
+        }
     }
 
+    # If you remove validation, first attempt will be successful (valid) and other 9 will not be executed
+    # so we need this test to keep trying to get valid data and once received - respond with the message above
     validate {
         '\'booking.log\''.toString().jsonPath(eventCode) = get(addEventTest).variables.eventCode
     }
@@ -37,13 +39,13 @@ name('Add event with available seats (.+)') {
 
     message {
         json {
-                 code = ${eventCode}
-                 name = 'event 1'
-                 date = toDateTime(01-01-2020 10:30:00)
-                 location = somewhere
-                 pricePerSeats [ ${1} ]
-                 takenSeats [${takenSeats:}]
-             }
+           code = ${eventCode}
+           name = 'event 1'
+           date = toDateTime(01-01-2020 10:30:00)
+           location = somewhere
+           pricePerSeats [ ${1} ]
+           takenSeats [${takenSeats:}]
+        }
     }
 }
 

@@ -23,7 +23,6 @@ public class EventChangedEventHandler {
     @RabbitListener(bindings = {
             @QueueBinding(value = @Queue(name = "event.changed"), exchange = @Exchange(name = "events"))})
     public void receiveEventChanged(EventChangedEvent event) {
-        System.out.println(event);
         try {
             eventService.changeEvent(event);
         } catch (Exception ex) {

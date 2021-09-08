@@ -42,7 +42,7 @@ public class EventServiceImpl implements EventService {
         eventEntity.setName(event.getName());
         eventEntity.setDate(event.getDate());
         eventEntity.setLocation(event.getLocation());
-        eventEntity.setTakenSeats(getTakenUpdatedSeats(eventEntity.getTakenSeats(), event.getTakenSeats()));
+        eventEntity.setTakenSeats(String.join(",",  event.getTakenSeats()));
         eventEntity.setPricePerSeats(String.join(",", event.getPricePerSeats()));
 
         eventDao.save(eventEntity);
