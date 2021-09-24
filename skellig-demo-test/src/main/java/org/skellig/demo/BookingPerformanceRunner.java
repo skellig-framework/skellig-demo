@@ -6,7 +6,6 @@ import org.skellig.teststep.runner.context.SkelligTestContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
 public class BookingPerformanceRunner extends SkelligPerformanceServiceRunner {
 
     @NotNull
@@ -27,7 +26,7 @@ public class BookingPerformanceRunner extends SkelligPerformanceServiceRunner {
         return new SkelligDemoContext();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         SpringApplication.run(BookingPerformanceRunner.class, args);
     }
 

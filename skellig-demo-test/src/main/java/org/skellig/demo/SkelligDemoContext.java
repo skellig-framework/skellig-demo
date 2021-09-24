@@ -10,7 +10,7 @@ import org.skellig.teststep.processor.ibmmq.IbmMqTestStepProcessor;
 import org.skellig.teststep.processor.ibmmq.model.factory.IbmMqTestStepFactory;
 import org.skellig.teststep.processor.jdbc.JdbcTestStepProcessor;
 import org.skellig.teststep.processor.jdbc.model.factory.JdbcTestStepFactory;
-import org.skellig.teststep.processor.performance.LongRunTestStepProcessor;
+import org.skellig.teststep.processor.performance.PerformanceTestStepProcessor;
 import org.skellig.teststep.processor.performance.metrics.prometheus.PrometheusMetricsFactory;
 import org.skellig.teststep.processor.performance.model.factory.PerformanceTestStepFactory;
 import org.skellig.teststep.processor.rmq.RmqConsumableTestStepProcessor;
@@ -120,7 +120,7 @@ public class SkelligDemoContext extends SkelligTestContext {
                 ),
                 createTestStepProcessorFrom(
                         rootTestStepProcessor ->
-                                new LongRunTestStepProcessor.Builder()
+                                new PerformanceTestStepProcessor.Builder()
                                         .testStepProcessor(rootTestStepProcessor)
                                         .testStepRegistry(getTestStepRegistry())
                                         .metricsFactory(new PrometheusMetricsFactory())
