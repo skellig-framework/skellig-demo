@@ -5,12 +5,12 @@ name('Request bookings report') {
     sendTo [local]
     readFrom [local]
 
-    message = 'bookings.all'
+    message = '\'bookings.all\''
 
     assert {
         local.toString() {
            xpath(/Report/Name) = Bookings
-           'xpath(/Report/Bookings//*[text() = \'${eventCode}\']/ancestor::Booking/EventCode)' = ${eventCode}
+           xpath(/Report/Bookings//*[text() \= \'${eventCode}\']/ancestor::Booking/EventCode) = ${eventCode}
         }
     }
 }

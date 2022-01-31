@@ -1,7 +1,7 @@
 version: '3'
 services:
   ibmmq:
-    image: ibmcom/mq:latest
+    image: ibmcom/mq:9.2.3.0-r1
     ports:
       - "1414:1414"
       - "9443:9443"
@@ -11,7 +11,6 @@ services:
       - MQ_QMGR_NAME=QM1
       - MQ_APP_PASSWORD=admin
     container_name: skellig-demo-ibmmq
-    user: mqm
     restart: always
 
   rabbitmq:
@@ -52,8 +51,8 @@ services:
     volumes:
       - "./skellig-cassandra-init.sh:/skellig-cassandra-init.sh"
     command: "sh /skellig-cassandra-init.sh"
-    healthcheck:
-      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+#    healthcheck:
+#      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
 #    volumes:
 #      - ./skellig-cassandra.cql:/docker-entrypoint-initdb.d/init.sql
     restart: always

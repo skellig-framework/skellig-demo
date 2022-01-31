@@ -1,40 +1,40 @@
 name('Event service is listening for the booking events') {
     protocol = rmq
     execution = async
-    timeout = 1000
-    delay = 500
-    attempts = 10
-    readFrom ['booking.log']
+    timeout = 100
+    delay = 100
+    attempts = 30
+    readFrom ['\'booking.log\'']
 
     message {
         json {
-                 eventCode = get(addEventTest).variables.eventCode
-                 success = true
+            eventCode = get(addEventTest).variables.eventCode
+            success = true
         }
     }
 
-    # If you remove validation, first attempt will be successful (valid) and other 9 will not be executed
-    # so we need this test to keep trying to get valid data and once received - respond with the message above
+    // If you remove validation, first attempt will be successful (valid) and other 9 will not be executed
+    // so we need this test to keep trying to get valid data and once received - respond with the message above
     validate {
         '\'booking.log\''.toString().jsonPath(eventCode) = get(addEventTest).variables.eventCode
-    }
+   }
 }
 
 name('Event registered in the system with available seats (.+)') {
     test = 'Add event with available seats ${1}'
     passed {
-               test = 'Event inserted in database'
-           }
+        test = 'Event inserted in database'
+    }
 }
 
 name('Add event with available seats (.+)') {
     id = addEventTest
     protocol = rmq
-    sendTo ['event.changed']
+    sendTo ["\'event.changed\'"]
     properties { content_type = application/json }
 
     variables {
-        eventCode = ${newEventCode:evt1inc(event,5)}
+        eventCode = ${newEventCode : evt1inc(event,5)}
     }
 
     message {
@@ -55,13 +55,13 @@ name('Event inserted in database') {
     command = select
 
     where {
-              code = get(addEventTest).variables.eventCode
-          }
+       code = get(addEventTest).variables.eventCode
+    }
 
     validate {
         skellig-db {
-                       size = int(1)
-                   }
+           size = int(1)
+       }
     }
 }
 
@@ -82,25 +82,25 @@ name('Seats (.+) have been booked successfully for the event') {
 name('Book seats (.+) of the event\s*(.*)') {
     url = '/booking/request'
     http_method = POST
-    http_headers{ Content-type = 'application/json'}
+    http_headers { Content-type = 'application/json'}
 
     variables {
-               eventCode = '${2:${get(addEventTest).variables.eventCode}}'
-              }
+       eventCode = ${2: #[get(addEventTest).variables.eventCode]}
+    }
 
     payload {
         json {
-                 eventCode = ${eventCode}
-                 seats = listOf(${1})
-             }
+           eventCode = ${eventCode}
+           seats = listOf(${1})
+        }
     }
 
     validate {
         statusCode = int(200)
         'body.toString()' {
-                              jsonPath(eventCode) = ${eventCode}
-                              jsonPath(success) = true
-                          }
+             jsonPath(eventCode) = ${eventCode}
+             jsonPath(success) = true
+        }
     }
 }
 
@@ -112,9 +112,9 @@ name('Try to book seats (.+) of the event\s*(.*)') {
 
     payload {
         json {
-                 eventCode = ${2}
-                 seats = listOf(${1})
-             }
+            eventCode = ${2}
+            seats = listOf(${1})
+        }
     }
 }
 
@@ -129,10 +129,10 @@ name('Failed to book (.+) because') {
 name('Payment service received booking confirmation') {
     id = bookingReceivedTest
     protocol = ibmmq
-    readFrom ['DEV.QUEUE.3']
+    readFrom ["\'DEV.QUEUE.3\'"]
 
     validate {
-          '\'DEV.QUEUE.3\''.toString().jsonPath(eventCode) = get(addEventTest).variables.eventCode
+          "\'DEV.QUEUE.3\'".toString().jsonPath(eventCode) = get(addEventTest).variables.eventCode
     }
 }
 
@@ -143,8 +143,8 @@ name('Confirm payment for the booking') {
     http_headers { Content-type = 'application/json'}
 
     variables {
-         bookingCode = get(bookingReceivedTest.result).'\'DEV.QUEUE.3\''.toString().jsonPath(bookingCode)
-         paymentToken = get(bookingReceivedTest.result).'\'DEV.QUEUE.3\''.toString().jsonPath(paymentToken)
+         bookingCode = get(bookingReceivedTest_result).'DEV.QUEUE.3'.toString().jsonPath(bookingCode)
+         paymentToken = get(bookingReceivedTest_result).'DEV.QUEUE.3'.toString().jsonPath(paymentToken)
     }
 
     payload {
@@ -157,7 +157,7 @@ name('Confirm payment for the booking') {
 
     validate {
          if {
-            condition = '${token} == invalid'
+            condition = '${token:} == invalid'
             then {  statusCode = int(400)  }
             else {  statusCode = int(200)  }
          }
@@ -165,7 +165,7 @@ name('Confirm payment for the booking') {
 }
 
 name('Payment for the booking was (\w+)') {
-    url = /booking/get(confirmBookingTest).(variables.bookingCode)
+    url = /booking/#[get(confirmBookingTest).variables.bookingCode]
     http_method = GET
     http_headers { Content-type = 'application/json'}
 
@@ -175,7 +175,7 @@ name('Payment for the booking was (\w+)') {
 }
 
 name('Cancel the booking and check the status') {
-    url = /booking/cancel/get(bookingReceivedTest.result).'\'DEV.QUEUE.3\''.toString().jsonPath(bookingCode)
+    url = /booking/cancel/#[get(bookingReceivedTest_result).'DEV.QUEUE.3'.toString().jsonPath(bookingCode)]
     http_method = POST
 
     validate {

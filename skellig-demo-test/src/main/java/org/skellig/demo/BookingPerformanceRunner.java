@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.skellig.performance.runner.service.SkelligPerformanceServiceRunner;
 import org.skellig.teststep.runner.context.SkelligTestContext;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 public class BookingPerformanceRunner extends SkelligPerformanceServiceRunner {
 

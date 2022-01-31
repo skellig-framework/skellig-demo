@@ -1,6 +1,6 @@
 name('check performance of simple request') {
    rps = 70
-   timeToRun = 10
+   timeToRun = 00:00:10
    run [
      get data
    ]
@@ -15,7 +15,7 @@ name('get data') {
 
 name('check performance of rmq request') {
    rps = 500
-   timeToRun = 15
+   timeToRun = 00:15:00
 
    before [
       service A is waiting for the events

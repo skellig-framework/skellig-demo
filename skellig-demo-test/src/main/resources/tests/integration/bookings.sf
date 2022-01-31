@@ -35,6 +35,6 @@ Name: Booking events
      |reason|<reason>|
    Data:
      |eventCode|bookingEventCode|available_seats |takenSeats|seats|reason                                                   |
-     |fe_001   |fe_001          |s1=1,s2=2,s3=3  |null      |s4   |Can't book seats [s4] which not exist in the event fe_001|
-     |fe_002   |fe_002          |s1=1            |s1        |s1   |Can't occupy already taken seats: [s1]                   |
+     |fe_001   |fe_001          |s1=1,s2=2,s3=3  |null      |s4   |Can\'t book seats [s4] which not exist in the event fe_001|
+     |fe_002   |fe_002          |s1=1            |s1        |s1   |Can\'t occupy already taken seats: [s1]                   |
      |fe_003   |wrong           |s1=1            |takenSeats|s1   |Event with code wrong does not exist                     |
