@@ -1,0 +1,37 @@
+Feature: Booking events
+
+    Scenario: Book seats of the event and pay
+        * Event registered in the system with available seats <available_seats>
+        * Event service is listening for the booking events
+        * Book seats <seats> of the event
+        * Seats <seats> have been booked successfully for the event
+        * Payment service received booking confirmation
+        * Confirm payment for the booking
+            | token | <token> |
+        * Payment for the booking was <payment_status>
+        Examples:
+            | available_seats          | seats | token   | payment_status |
+            | s1=10,s2=20              | s2    | invalid | PENDING        |
+            | s1=10,s2=20,s3=50,s4=100 | s1,s3 |         | CONFIRMED      |
+
+
+    Scenario: Book seats of the event and cancel
+        * Event registered in the system with available seats s1=10
+        * Event service is listening for the booking events
+        * Book seats s1 of the event
+        * Seats s1 have been booked successfully for the event
+        * Payment service received booking confirmation
+        * Cancel the booking and check the status
+
+    Scenario: Unsuccessfully book an event
+        * Event registered in the system with available seats <available_seats>
+            | newEventCode | <eventCode>  |
+            | takenSeats   | <takenSeats> |
+        * Try to book seats <seats> of the event <bookingEventCode>
+        * Failed to book <seats> because
+            | reason | <reason> |
+        Examples:
+            | eventCode | bookingEventCode | available_seats | takenSeats | seats | reason                                                     |
+            | fe_001    | fe_001           | s1=1,s2=2,s3=3  | null       | s4    | Can\'t book seats [s4] which not exist in the event fe_001 |
+            | fe_002    | fe_002           | s1=1            | s1         | s1    | Can\'t occupy already taken seats: [s1]                    |
+            | fe_003    | wrong            | s1=1            | takenSeats | s1    | Event with code wrong does not exist                       |

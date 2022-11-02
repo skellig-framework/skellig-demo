@@ -40,7 +40,7 @@ name('Add event with available seats (.+)') {
     message {
         json {
            code = ${eventCode}
-           name = 'event 1'
+           "name" = 'event 1'
            date = toDateTime(01-01-2020 10:30:00)
            location = somewhere
            pricePerSeats [ ${1} ]
@@ -121,7 +121,7 @@ name('Try to book seats (.+) of the event\s*(.*)') {
 name('Failed to book (.+) because') {
 
     validate {
-          fromTest = tryBookSeatsTest
+          'fromTest' = tryBookSeatsTest
           body.toString() = ${reason}
     }
 }

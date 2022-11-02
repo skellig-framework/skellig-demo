@@ -1,82 +1,81 @@
-name('check performance of simple request') {
-   rps = 70
-   timeToRun = 00:00:10
-   run [
-     get data
-   ]
-}
-
-name('get data') {
-    url = '/${prefix:data}/id/'
-    http_method = GET
-    data = ${field1}
-
-}
-
-name('check performance of rmq request') {
-   rps = 500
-   timeToRun = 00:15:00
-
-   before [
-      service A is waiting for the events
-   ]
-
-   run [
-     service B sends an event
-   ]
-}
-
-name('service A is waiting for the events') {
-    protocol = rmq
-    consumeFrom [
-    'booking.log']
-
-    validate [
-        not(null)
+name ('check performance of simple request') {
+    rps = 70
+    timeToRun = 00:00:10
+    run [
+        get data
     ]
 }
 
-name('service B sends an event') {
+name ('get data') {
+    url = '/${prefix:data}/id/'
+    http_method = GET
+    data = ${field1}
+}
+
+name ('check performance of rmq request') {
+    rps = 500
+    timeToRun = 00:15:00
+
+    before [
+        service A is waiting for the events
+    ]
+
+    run [
+        service B sends an event
+    ]
+}
+
+name ('service A is waiting for the events') {
     protocol = rmq
-    sendTo ['booking.log']
+    consumeFrom [
+    '\'booking.log\'']
+
+    validate [
+    not(null)
+    ]
+}
+
+name ('service B sends an event') {
+    protocol = rmq
+    sendTo ['\'booking.log\'']
 
     message {
         json {
-                 eventCode = C0001
-                 success = true
-             }
+            eventCode = C0001
+            success = true
+        }
     }
 }
 
-name('notify subscribers with updated bookings') {
+name ('notify subscribers with updated bookings') {
     url = '/booking/report/notify/all'
     http_method = POST
 }
 
-name('check performance of updated bookings') {
-   rps = ${rps_value:100}
-   timeToRun = ${ttr}
+name ('check performance of updated bookings') {
+    rps = ${rps_value:100}
+    timeToRun = ${ttr}
 
-   before [
-     subscribe to updated bookings events
-   ]
+    before [
+        subscribe to updated bookings events
+    ]
 
-   run [
-     notify subscribers with updated bookings
-   ]
+    run [
+        notify subscribers with updated bookings
+    ]
 }
 
-name('subscribe to updated bookings events') {
+name ('subscribe to updated bookings events') {
     protocol = tcp
     timeout = 2000
     consumeFrom [
-    'booking-subscription-1'
+        'booking-subscription-1'
     'booking-subscription-2'
     'booking-subscription-3'
     'booking-subscription-4'
     ]
 
     validate [
-        not(null)
+    not(null)
     ]
 }

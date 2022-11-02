@@ -1,0 +1,12 @@
+Feature: Bookings reports
+
+   Scenario: Request booking report
+   * Event registered in the system with available seats <available_seats>
+       |newEventCode |<eventCode> |
+   * Event service is listening for the booking events
+   * Try to book seats <book_seats> of the event <eventCode>
+   * Request bookings report
+      |eventCode|<eventCode>|
+   Examples:
+        |eventCode |available_seats |book_seats|
+        |r_evnt_002|s1=10           |s1        |
