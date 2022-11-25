@@ -40,7 +40,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new HttpTestStepProcessor.Builder()
                                 .withHttpService(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -49,7 +48,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new JdbcTestStepProcessor.Builder()
                                 .withDbServers(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -58,7 +56,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new CassandraTestStepProcessor.Builder()
                                 .withDbServers(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -67,7 +64,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new RmqTestStepProcessor.Builder()
                                 .rmqChannels(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -76,7 +72,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new RmqConsumableTestStepProcessor.Builder()
                                 .rmqChannels(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -85,7 +80,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new IbmMqTestStepProcessor.Builder()
                                 .ibmMqChannels(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -94,7 +88,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new TcpTestStepProcessor.Builder()
                                 .tcpChannels(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -103,7 +96,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new TcpConsumableTestStepProcessor.Builder()
                                 .tcpChannels(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
@@ -112,7 +104,6 @@ public class SkelligDemoContext extends SkelligTestContext {
                 createTestStepProcessorFrom(
                         new UnixShellTestStepProcessor.Builder()
                                 .withHost(config)
-                                .withTestStepResultConverter(getTestStepResultConverter())
                                 .withTestScenarioState(getTestScenarioState())
                                 .withValidator(getTestStepResultValidator())
                                 .build(),
