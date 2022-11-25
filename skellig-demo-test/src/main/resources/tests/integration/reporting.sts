@@ -1,16 +1,16 @@
-name('Request bookings report') {
+name("Request bookings report") {
     protocol = tcp
     timeout = 1000
     attempts = 1
     sendTo [local]
     readFrom [local]
 
-    message = '\'bookings.all\''
+    message = 'bookings.all'
 
     assert {
         local.toString() {
            xpath(/Report/Name) = Bookings
-           xpath(/Report/Bookings//*[text() \= \'${eventCode}\']/ancestor::Booking/EventCode) = ${eventCode}
+           "xpath('/Report/Bookings//*[text() = \''${eventCode}'\']/ancestor::Booking/EventCode')" = ${eventCode}
         }
     }
 }

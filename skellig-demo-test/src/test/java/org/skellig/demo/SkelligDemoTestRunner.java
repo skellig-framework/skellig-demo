@@ -6,7 +6,7 @@ import org.skellig.runner.annotation.SkelligOptions;
 
 @RunWith(SkelligRunner.class)
 @SkelligOptions(
-        features = {"tests/"},
+        features = {"tests"},
         testSteps = {"tests", "org.skellig.demo"},
         context = SkelligDemoContext.class,
         config = "skellig-demo-${test.profile}.conf")
