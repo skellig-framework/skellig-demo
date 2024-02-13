@@ -14,11 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,7 +53,7 @@ public class BookingServiceImpl implements BookingService {
         entity.setSeats(String.join(",", bookEventRequest.getSeats()));
         entity.setPrice(price);
         entity.setEvent(event);
-        entity.setPaymentToken(RandomStringUtils.random(10,true,true));
+        entity.setPaymentToken(RandomStringUtils.random(10, true, true));
 
         bookingDao.save(entity);
 

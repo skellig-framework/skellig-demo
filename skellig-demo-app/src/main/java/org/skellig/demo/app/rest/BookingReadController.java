@@ -34,7 +34,7 @@ public class BookingReadController {
 
     @GetMapping("/booking/{id}")
     @ResponseBody
-    public Booking booking(@PathVariable int id) {
+    public Booking booking(@PathVariable("id") int id) {
         return bookingService.getByBookingCode(id);
     }
 }

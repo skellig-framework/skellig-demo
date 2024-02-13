@@ -12,7 +12,9 @@
     <artifactId>skellig-demo-test</artifactId>
 
     <properties>
-        <skellig.version>2.0.8-beta</skellig.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <skellig.version>2.1.0-RC</skellig.version>
     </properties>
 
     <dependencies>
@@ -30,20 +32,50 @@
 
         <dependency>
             <groupId>org.skelligframework</groupId>
-            <artifactId>skellig-test-step-runner-default</artifactId>
+            <artifactId>skellig-test-step-processing-rmq</artifactId>
+            <version>${skellig.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.skelligframework</groupId>
+            <artifactId>skellig-test-step-processing-ibmmq</artifactId>
+            <version>${skellig.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.skelligframework</groupId>
+            <artifactId>skellig-test-step-processing-tcp</artifactId>
+            <version>${skellig.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.skelligframework</groupId>
+            <artifactId>skellig-test-step-processing-http</artifactId>
+            <version>${skellig.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.skelligframework</groupId>
+            <artifactId>skellig-test-step-processing-jdbc</artifactId>
+            <version>${skellig.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.skelligframework</groupId>
+            <artifactId>skellig-test-step-processing-cassandra</artifactId>
             <version>${skellig.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.12.0</version>
+            <version>2.16.1</version>
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.23</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.3.0</version>
         </dependency>
     </dependencies>
 

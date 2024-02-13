@@ -23,7 +23,7 @@ Feature: Booking events
         * Payment service received booking confirmation
         * Cancel the booking and check the status
 
-    Scenario: Unsuccessfully book an event
+    Scenario: Unsuccessfully book an event with reason <reason>
         * Event registered in the system with available seats <available_seats>
             | newEventCode | <eventCode>  |
             | takenSeats   | <takenSeats> |

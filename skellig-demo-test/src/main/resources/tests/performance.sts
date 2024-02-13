@@ -7,8 +7,8 @@ name ("check performance of simple request") {
 }
 
 name ("get data") {
-    url = "/${prefix:data}/id/"
-    http_method = GET
+    url = "/" + ${prefix,data}+ "/id/"
+    method = GET
     data = ${field1}
 }
 
@@ -28,16 +28,16 @@ name ("check performance of rmq request") {
 name ("service A is waiting for the events") {
     protocol = rmq
     consumeFrom [
-    'booking.log']
+        "booking.log"]
 
-    validate [
-    not(null)
-    ]
+    validate {
+        $ != null = true
+    }
 }
 
 name ("service B sends an event") {
     protocol = rmq
-    sendTo ['booking.log']
+    sendTo ["booking.log"]
 
     message {
         json {
@@ -49,11 +49,11 @@ name ("service B sends an event") {
 
 name ("notify subscribers with updated bookings") {
     url = "/booking/report/notify/all"
-    http_method = POST
+    method = POST
 }
 
 name ("check performance of updated bookings") {
-    rps = ${rps_value:100}
+    rps = ${rps_value,100}
     timeToRun = ${ttr}
 
     before [
@@ -69,13 +69,13 @@ name ("subscribe to updated bookings events") {
     protocol = tcp
     timeout = 2000
     consumeFrom [
-        "booking-subscription-1"
-    "booking-subscription-2"
-    "booking-subscription-3"
-    "booking-subscription-4"
+        "booking-subscription-1",
+        "booking-subscription-2",
+        "booking-subscription-3",
+        "booking-subscription-4"
     ]
 
-    validate [
-    not(null)
-    ]
+    validate {
+        $ != null = true
+    }
 }

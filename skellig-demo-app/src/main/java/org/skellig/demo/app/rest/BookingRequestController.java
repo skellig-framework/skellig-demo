@@ -75,7 +75,7 @@ public class BookingRequestController {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @PostMapping("/booking/cancel/{code}")
-    public void cancelBookingRequest(@PathVariable long code) {
+    public void cancelBookingRequest(@PathVariable("code") long code) {
         try {
             bookingService.cancelBooking(code);
         } catch (Exception ex) {

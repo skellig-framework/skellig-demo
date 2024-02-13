@@ -2,25 +2,22 @@ name ("Event service is listening for the inbound events") {
     protocol = rmq
     execution = async
     timeout = 5000
-    readFrom ['booking.log']
+    readFrom ["booking.log"]
 
-    variables {
-        eventCode = get(updateEventTest).variables.code
-        body {
-            eventCode = ${eventCode}
-            success = true
-        }
+    values {
+        eventCode = get(updateEventTest).values.code
     }
 
-    message = toJson(${body})
+    message {
+        eventCode = ${eventCode}
+        success = true
+    }
 
     validate {
-       // just a demonstration of different ways how the response can be validated
-        'booking.log'.toString().jsonPath(eventCode) = ${eventCode}
-       // '\'booking.log\''.toString() {
-       //        all_match [
-       //              match('.*eventCode\".*:.*\"${eventCode}\".*')
-       //        ]
+    // just a demonstration of different ways how the response can be validated
+        $."booking.log".toString().jsonPath(eventCode) = ${eventCode}
+    // "booking.log".toString() {
+       //        match(".*eventCode\".*:.*\"${eventCode}\".*") = true
        //        jsonPath(eventCode) = contains(${eventCode})
        // }
     }
@@ -28,17 +25,17 @@ name ("Event service is listening for the inbound events") {
 
 name ("Event (.*) exist in the system with default seats") {
     id = updateEventTest
-    servers [skellig-db]
+    servers ["skellig-db"]
     table = event
     command = update
 
-    variables {
-        code = ${1:evnt00001}
+    values {
+        code = ${1,evnt00001}
     }
 
-    values {
-        "name" = "event 1"
-        date = toDateTime(01-01-2021 12:30:00)
+    data {
+        name = "event 1"
+        date = toDateTime("01-01-2021 12:30:00")
         location = "city 1"
         price_per_seats = "s1=1,s2=2,s3=3,s4=4,s5=5"
         taken_seats = s5
@@ -49,53 +46,41 @@ name ("Event (.*) exist in the system with default seats") {
 }
 
 name ("Booking was recorded in the DB with seats (.*)") {
-    servers [skellig-db]
+    servers ["skellig-db"]
     table = booking
     command = select
 
     where {
-        code = get(updateEventTest).variables.code
+        code = get(updateEventTest).values.code
     }
 
     validate {
-        skellig-db {
-            any_match [
-                {
-                    seats = ${1:s1}
-                }
-            ]
-        }
+        $."skellig-db".any(i -> i.seats == ${1,s1}) = true
     }
 }
 
 name ("Event (.+) no longer have the taken seats (.+)") {
     provider = jdbc
-    servers [skellig-db]
+    servers ["skellig-db"]
     query = "SELECT taken_seats FROM event WHERE code=?"
 
     where [ ${1} ]
 
     validate {
-        skellig-db {
-            size() = 1.toInt()
-            fromIndex(0).taken_seats = contains(${2:s1})
+        $."skellig-db" {
+            size() = "1".toInt()
+            fromIndex(0).taken_seats.contains(${2,s1}) = true
         }
     }
 }
 
 name ("Event Changed Log was recorded in the DB for event (.+)") {
     provider = cassandra
-    servers [skellig-log-db]
-    table = 'skellig.eventchangedlog'
+    servers ["skellig-log-db"]
+    table = "skellig.eventchangedlog"
     command = select
 
     validate {
-        skellig-log-db {
-            any_match [
-                {
-                    "after.jsonPath(code,true)" = ${1}
-                }
-            ]
-        }
+        $."skellig-log-db".any(i -> i.after.jsonPath(code,true) == ${1}) = true
     }
 }
