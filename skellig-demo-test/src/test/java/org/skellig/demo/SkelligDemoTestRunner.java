@@ -8,7 +8,6 @@ import org.skellig.runner.annotation.SkelligOptions;
 @SkelligOptions(
         features = {"tests"},
         testSteps = {"tests", "org.skellig.demo"},
-        context = SkelligDemoContext.class,
         config = "skellig-demo-${test.profile}.conf")
 public class SkelligDemoTestRunner {
 }

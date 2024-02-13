@@ -40,9 +40,8 @@ spring:
     username: skellig
     password: skellig
 
-  data:
-    cassandra:
-      keyspaceName: skellig
-      contactPoints: localhost
-      port: 9042
-      schemaAction: CREATE_IF_NOT_EXISTS
+  cassandra:
+    keyspace-name: skellig
+    contact-points: localhost
+    schema-action: CREATE_IF_NOT_EXISTS
+    port: 9042
