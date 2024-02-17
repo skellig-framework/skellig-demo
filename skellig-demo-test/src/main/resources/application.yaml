@@ -1,0 +1,15 @@
+server:
+  port: 7080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+      base-path: /
+      path-mapping:
+        prometheus: metrics
+
+spring:
+  cassandra:
+    local-datacenter: datacenter1
