@@ -1,8 +1,8 @@
 name ("check performance of simple request") {
     rps = 70
-    timeToRun = 00:00:10
+    timeToRun = "00:00:10"
     run [
-        get data
+        "get data"
     ]
 }
 
@@ -14,14 +14,14 @@ name ("get data") {
 
 name ("check performance of rmq request") {
     rps = 500
-    timeToRun = 00:15:00
+    timeToRun = "00:15:00"
 
     before [
-        service A is waiting for the events
+        "service A is waiting for the events"
     ]
 
     run [
-        service B sends an event
+        "service B sends an event"
     ]
 }
 
@@ -57,11 +57,11 @@ name ("check performance of updated bookings") {
     timeToRun = ${ttr}
 
     before [
-        subscribe to updated bookings events
+        "subscribe to updated bookings events"
     ]
 
     run [
-        notify subscribers with updated bookings
+        "notify subscribers with updated bookings"
     ]
 }
 

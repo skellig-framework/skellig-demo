@@ -14,7 +14,7 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <skellig.version>2.1.0-RC</skellig.version>
+        <skellig.version>2.1.1-RC</skellig.version>
     </properties>
 
     <dependencies>
