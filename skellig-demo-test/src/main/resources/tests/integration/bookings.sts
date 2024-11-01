@@ -6,12 +6,10 @@ name ("Event service is listening for the booking events") {
     attempts = 30
     readFrom ["booking.log"]
 
-    message {
-        toJson() {
-            eventCode = get(addEventTest).values.eventCode
-            success = true
-        }
-    }
+    message = toJson({
+                  eventCode = get(addEventTest).values.eventCode
+                  success = true
+              })
 
     // If you remove validation, first attempt will be successful (valid) and other 9 will not be executed
     // so we need this test to keep trying to get valid data and once received - respond with the message above
@@ -21,10 +19,14 @@ name ("Event service is listening for the booking events") {
 }
 
 name ("Event registered in the system with available seats (.+)") {
-    test = "Add event with available seats " + ${1}
-    passed {
-        test = "Event inserted in database"
-    }
+     task {
+            runTest("Add event with available seats " + ${1}) {
+                onPassed {
+                    runTest("Event inserted in database") {
+                    }
+                }
+            }
+        }
 }
 
 name ("Add event with available seats (.+)") {
@@ -95,7 +97,7 @@ name ("Book seats (.+) of the event\s*(.*)") {
         statusCode = "200".toInt()
         body.toString() {
             jsonPath(eventCode) = ${eventCode}
-            jsonPath(success) = "true"
+            jsonPath(success) = true
         }
     }
 }
