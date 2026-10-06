@@ -13,4 +13,4 @@ until echo $CQL | cqlsh; do
   sleep 2
 done &
 
-exec /docker-entrypoint.sh "$@"
+exec docker-entrypoint.sh "$@"

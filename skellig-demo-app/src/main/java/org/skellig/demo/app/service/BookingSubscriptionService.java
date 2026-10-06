@@ -1,12 +1,12 @@
 package org.skellig.demo.app.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.skellig.demo.app.exception.SkelligServiceException;
 import org.skellig.demo.app.rest.model.Booking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.DataOutputStream;
 import java.net.ServerSocket;

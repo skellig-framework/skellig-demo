@@ -1,7 +1,6 @@
 package org.skellig.demo.app.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.skellig.demo.app.rest.model.BookEventRequest;
 import org.skellig.demo.app.rest.model.BookEventResponse;
 import org.skellig.demo.app.rest.model.BookingPaymentRequest;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.ObjectMapper;
 
 @RestController
 public class BookingRequestController {

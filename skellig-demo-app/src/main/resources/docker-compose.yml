@@ -1,7 +1,7 @@
 version: '3'
 services:
   ibmmq:
-    image: ibmcom/mq:9.2.3.0-r1
+    image: ibmcom/mq:9.2.4.0-r1-s390x
     ports:
       - "1414:1414"
       - "9443:9443"
@@ -23,7 +23,7 @@ services:
     restart: always
 
   mysql:
-    image: mysql:5.7
+    image: mysql:9.7.2
     container_name: skellig-demo-mysql
     ports:
       - "3306:3306"
@@ -41,7 +41,7 @@ services:
       retries: 10
 
   cassandra:
-    image: cassandra:3.11.2
+    image: cassandra:6.0
     container_name: skellig-demo-cassandra
     ports:
       - "9042:9042"

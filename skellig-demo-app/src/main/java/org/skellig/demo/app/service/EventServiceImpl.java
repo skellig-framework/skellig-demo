@@ -1,7 +1,5 @@
 package org.skellig.demo.app.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.skellig.demo.app.dao.EventChangedLogDao;
 import org.skellig.demo.app.dao.EventDao;
 import org.skellig.demo.app.dao.model.EventChangedLog;
@@ -11,6 +9,7 @@ import org.skellig.demo.app.exception.SkelligServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -69,7 +68,7 @@ public class EventServiceImpl implements EventService {
                 Map<String, String> pricesPerSeat = getGroupedPricesPerSeats(event.getPricePerSeats());
                 List<String> nonExistingSeats = seatsToOccupy.stream()
                         .filter(seat -> !pricesPerSeat.containsKey(seat))
-                        .collect(Collectors.toList());
+                        .toList();
                 if (nonExistingSeats.isEmpty()) {
                     event.setTakenSeats(getTakenUpdatedSeats(event.getTakenSeats(), seatsToOccupy));
                     eventDao.save(event);
@@ -111,11 +110,7 @@ public class EventServiceImpl implements EventService {
 
     private void saveEventChangedLog(EventEntity eventEntity) {
         EventChangedLog log = new EventChangedLog();
-        try {
-            log.setAfter(objectMapper.writeValueAsString(eventEntity));
-        } catch (JsonProcessingException e) {
-            log.setAfter("invalid");
-        }
+        log.setAfter(objectMapper.writeValueAsString(eventEntity));
         eventChangedLogDao.save(log);
     }
 }
